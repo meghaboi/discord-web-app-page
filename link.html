@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Cricket - Link Your Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .avatar-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid #5865F2;
+            margin-bottom: 15px;
+        }
+        
+        .display-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .username {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .info-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .info-value {
+            color: #333;
+            font-family: monospace;
+            background: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .success-box h2 {
+            margin-bottom: 10px;
+        }
+        
+        .btn {
+            background: #5865F2;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #4752C4;
+            transform: translateY(-2px);
+        }
+        
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .note strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .note p {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏏</div>
+            <h1>Link Your Profile</h1>
+            <p class="subtitle">Connect your Discord with VR Cricket</p>
+        </div>
+        
+        <div id="content"></div>
+    </div>
+    
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
+        const username = urlParams.get('username');
+        const displayName = urlParams.get('display_name');
+        const avatar = urlParams.get('avatar');
+        
+        const contentDiv = document.getElementById('content');
+        
+        if (!userId || !username) {
+            // No user data in URL
+            contentDiv.innerHTML = `
+                <div class="error">
+                    <h2>❌ Invalid Link</h2>
+                    <p style="margin-top: 10px;">This link is missing user information. Please go back to Discord and click the button again.</p>
+                </div>
+            `;
+        } else {
+            // Display user info
+            contentDiv.innerHTML = `
+                <div class="success-box">
+                    <h2>✅ Discord Account Detected!</h2>
+                    <p>We've received your Discord information</p>
+                </div>
+                
+                <div class="avatar-section">
+                    <img class="avatar" src="${avatar}" alt="Avatar">
+                    <div class="display-name">${displayName || username}</div>
+                    <div class="username">@${username}</div>
+                </div>
+                
+                <div class="info-card">
+                    <h3>🔗 Link Information</h3>
+                    <div class="info-row">
+                        <span class="info-label">Discord ID:</span>
+                        <span class="info-value">${userId}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Username:</span>
+                        <span class="info-value">${username}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Display Name:</span>
+                        <span class="info-value">${displayName || 'Not set'}</span>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <strong>📝 For Backend Integration:</strong>
+                    <p>This page received the user's Discord data via URL parameters. In production, you would now:</p>
+                    <p>1. Ask user to enter their VR Cricket Game ID/Username<br>
+                    2. Send both Discord ID (${userId}) and Game ID to your backend API<br>
+                    3. Store the link in your database</p>
+                </div>
+                
+                <button class="btn" onclick="completeLink()">Complete Linking (POC)</button>
+            `;
+            
+            // Log data for development
+            console.log('Received Discord Data:', {
+                userId,
+                username,
+                displayName,
+                avatar
+            });
+        }
+        
+        function completeLink() {
+            alert(`✅ Link Complete!\n\nDiscord ID: ${userId}\nUsername: ${username}\n\nIn production, this would be saved to your database.`);
+        }
+    </script>
+</body>
+</html>
