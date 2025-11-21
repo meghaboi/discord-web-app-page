@@ -147,12 +147,6 @@
             transform: translateY(-2px);
         }
         
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
         .note {
             background: #fff3cd;
             border-left: 4px solid #ffc107;
@@ -181,28 +175,6 @@
             border-radius: 10px;
             text-align: center;
         }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #5865F2;
-            font-size: 16px;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #5865F2;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
@@ -223,15 +195,8 @@
         const username = urlParams.get('username');
         const displayName = urlParams.get('display_name');
         const avatar = urlParams.get('avatar');
-        const guildId = urlParams.get('guild_id');
-        const roleId = urlParams.get('role_id');
         
         const contentDiv = document.getElementById('content');
-        
-        // IMPORTANT: Change this to your bot's server URL
-        // For local testing: 'http://localhost:8080'
-        // For production: 'http://YOUR_SERVER_IP:8080' or use ngrok
-        const BOT_SERVER_URL = 'http://localhost:8080';
         
         if (!userId || !username) {
             // No user data in URL
@@ -243,14 +208,6 @@
             `;
         } else {
             // Display user info
-            let roleInfo = '';
-            if (roleId) {
-                roleInfo = `<div class="info-row">
-                    <span class="info-label">Role to Receive:</span>
-                    <span class="info-value">Role ID: ${roleId}</span>
-                </div>`;
-            }
-            
             contentDiv.innerHTML = `
                 <div class="success-box">
                     <h2>✅ Discord Account Detected!</h2>
@@ -277,16 +234,17 @@
                         <span class="info-label">Display Name:</span>
                         <span class="info-value">${displayName || 'Not set'}</span>
                     </div>
-                    ${roleInfo}
                 </div>
                 
                 <div class="note">
-                    <strong>📝 What happens next?</strong>
-                    <p>When you click "Complete Linking", your Discord profile will be linked to VR Cricket${roleId ? ' and you\'ll receive your role' : ''}!</p>
+                    <strong>📝 For Backend Integration:</strong>
+                    <p>This page received the user's Discord data via URL parameters. In production, you would now:</p>
+                    <p>1. Ask user to enter their VR Cricket Game ID/Username<br>
+                    2. Send both Discord ID (${userId}) and Game ID to your backend API<br>
+                    3. Store the link in your database</p>
                 </div>
                 
-                <button class="btn" id="linkButton" onclick="completeLink()">Complete Linking</button>
-                <div id="statusMessage"></div>
+                <button class="btn" onclick="completeLink()">Complete Linking (POC)</button>
             `;
             
             // Log data for development
@@ -294,65 +252,12 @@
                 userId,
                 username,
                 displayName,
-                avatar,
-                guildId,
-                roleId
+                avatar
             });
         }
         
-        async function completeLink() {
-            const button = document.getElementById('linkButton');
-            const statusMessage = document.getElementById('statusMessage');
-            
-            // Disable button and show loading
-            button.disabled = true;
-            button.textContent = 'Linking...';
-            statusMessage.innerHTML = '<div class="loading"><div class="spinner"></div>Connecting to Discord...</div>';
-            
-            try {
-                // Send verification to bot
-                const response = await fetch(`${BOT_SERVER_URL}/verify`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user_id: userId,
-                        guild_id: guildId,
-                        role_id: roleId || null,
-                        success: true
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    statusMessage.innerHTML = `
-                        <div class="success-box" style="margin-top: 20px;">
-                            <h2>✅ Successfully Linked!</h2>
-                            <p>Your profile has been linked to VR Cricket!</p>
-                            ${data.role_assigned ? `<p style="margin-top: 10px;">🎁 You received the <strong>${data.role_name}</strong> role!</p>` : ''}
-                            <p style="margin-top: 10px;">Check your Discord DMs for confirmation.</p>
-                        </div>
-                    `;
-                    button.textContent = 'Linked Successfully!';
-                    button.style.background = '#28a745';
-                } else {
-                    throw new Error(data.message || 'Unknown error');
-                }
-                
-            } catch (error) {
-                console.error('Error linking profile:', error);
-                statusMessage.innerHTML = `
-                    <div class="error" style="margin-top: 20px;">
-                        <h2>❌ Link Failed</h2>
-                        <p style="margin-top: 10px;">Error: ${error.message}</p>
-                        <p style="margin-top: 10px;">Please make sure the bot is running and try again.</p>
-                    </div>
-                `;
-                button.disabled = false;
-                button.textContent = 'Try Again';
-            }
+        function completeLink() {
+            alert(`✅ Link Complete!\n\nDiscord ID: ${userId}\nUsername: ${username}\n\nIn production, this would be saved to your database.`);
         }
     </script>
 </body>
