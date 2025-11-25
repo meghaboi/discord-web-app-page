@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Cricket - Link Your Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .avatar-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid #5865F2;
+            margin-bottom: 15px;
+        }
+
+        .display-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .username {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .info-value {
+            color: #333;
+            font-family: monospace;
+            background: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success-box h2 {
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: #5865F2;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #4752C4;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏏</div>
+            <h1>Link Your Profile</h1>
+            <p class="subtitle">Connect your Discord with VR Cricket</p>
+        </div>
+
+        <div id="content"></div>
+    </div>
+
+    <script>
+        // Configuration - Update this to your Django backend URL
+        const BACKEND_URL = 'http://127.0.0.1:8000/api/link/';
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
+        const username = urlParams.get('username');
+        const displayName = urlParams.get('display_name');
+        const avatar = urlParams.get('avatar');
+        const guildId = urlParams.get('guild_id');
+        const roleId = urlParams.get('role_id');
+
+        const contentDiv = document.getElementById('content');
+
+        if (!userId || !username || !guildId) {
+            // No user data in URL
+            contentDiv.innerHTML = `
+                <div class="error">
+                    <h2>❌ Invalid Link</h2>
+                    <p style="margin-top: 10px;">This link is missing user information. Please go back to Discord and click the button again.</p>
+                </div>
+            `;
+        } else {
+            // Display user info
+            contentDiv.innerHTML = `
+                <div class="success-box">
+                    <h2>✅ Discord Account Detected!</h2>
+                    <p>We've received your Discord information</p>
+                </div>
+
+                <div class="avatar-section">
+                    <img class="avatar" src="${avatar}" alt="Avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    <div class="display-name">${displayName || username}</div>
+                    <div class="username">@${username}</div>
+                </div>
+
+                <div class="info-card">
+                    <h3>🔗 Link Information</h3>
+                    <div class="info-row">
+                        <span class="info-label">Discord ID:</span>
+                        <span class="info-value">${userId}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Username:</span>
+                        <span class="info-value">${username}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Display Name:</span>
+                        <span class="info-value">${displayName || 'Not set'}</span>
+                    </div>
+                </div>
+
+                <button class="btn" id="linkBtn" onclick="completeLink()">Complete Linking</button>
+                <div id="statusMessage" style="margin-top: 15px; text-align: center;"></div>
+            `;
+        }
+
+        async function completeLink() {
+            const btn = document.getElementById('linkBtn');
+            const statusDiv = document.getElementById('statusMessage');
+
+            // Disable button and show loading
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Linking...';
+            statusDiv.innerHTML = '';
+
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        discord_id: userId,
+                        discord_username: username,
+                        discord_display_name: displayName || '',
+                        discord_avatar: avatar || '',
+                        guild_id: guildId,
+                        role_id: roleId,
+                        game_profile_id: '' // You can add a form field for this later
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    btn.innerHTML = '✅ Linked Successfully!';
+                    btn.style.background = '#28a745';
+
+                    let message = `<div style="color: #28a745; font-weight: 600;">
+                        ✅ ${data.message}
+                    </div>`;
+
+                    if (data.role_assigned) {
+                        message += `<div style="color: #5865F2; margin-top: 10px;">
+                            🎁 You've been assigned the <strong>${data.role_name}</strong> role!
+                        </div>`;
+                    }
+
+                    message += `<div style="color: #666; margin-top: 15px; font-size: 14px;">
+                        Check your Discord DMs for confirmation!
+                    </div>`;
+
+                    statusDiv.innerHTML = message;
+                } else {
+                    throw new Error(data.message || 'Failed to link profile');
+                }
+
+            } catch (error) {
+                btn.disabled = false;
+                btn.innerHTML = 'Complete Linking';
+                statusDiv.innerHTML = `<div style="color: #dc3545; font-weight: 600;">
+                    ❌ Error: ${error.message}
+                    <br><small>Please try again or contact support.</small>
+                </div>`;
+            }
+        }
+    </script>
+</body>
+</html>
